@@ -3,6 +3,7 @@
 #include "monitor/watchpoint.h"
 #include "nemu.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -62,6 +63,43 @@ static int cmd_info(char *args) {
   return 0;
 }
 
+static int cmd_x(char *args) {
+  char *arg;
+  int i, N, expr;
+  uint32_t value;
+
+  arg = strtok(NULL, " ");
+  if(NULL == arg) {
+    return 0;
+  }
+  N = atoi(arg);
+  if(0 == N) {
+    return 0;
+  }
+
+  arg = strtok(NULL, " ");
+  if(NULL == arg) {
+    return 0;
+  }
+  expr = atoi(arg);
+  if(0 == expr) {
+    return 0;
+  }
+
+  for(i = 0; i < N; ++i, expr += 4) {
+    value = vaddr_read(expr, 4);
+    if(0 == i%4) {
+      printf("%-#10x: ", expr + 16*i);
+    }
+    printf("%-#10x ", value);
+    if(0 == (i+1)%4) {
+      printf("\n");
+    }
+  }
+
+  return 0;
+}
+
 static int cmd_q(char *args) {
   return -1;
 }
@@ -77,6 +115,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "si", "\"si [N]\" , execute N instructions of the program(default N = 1)", cmd_si },
   { "info", "\"info SUBCMD\" , info r: print register status; info w:print watchpoints' informations", cmd_info },
+  { "x", "\"x N EXPR\" , Find the value of the expression EXPR, the result as the starting memory address, in the form of hexadecimal output of the four N bytes", cmd_x },
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
