@@ -45,6 +45,9 @@ static int cmd_si(char *args) {
 }
 
 static int cmd_info(char *args) {
+  if(NULL == args) {
+    return 0;
+  }
   if(0 == strcmp(args, "r")) {
     printf("%-10s %#10x %10d\n", "eax", cpu.eax, cpu.eax);
   }
