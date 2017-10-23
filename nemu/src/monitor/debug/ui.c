@@ -91,7 +91,7 @@ static int cmd_x(char *args) {
     if(0 == i%4) {
       printf("%-#10x: ", expr);
     }
-    printf("%0#15x ", value);
+    printf("%0#8x ", value);
     if(0 == (i+1)%4) {
       printf("\n");
     }
