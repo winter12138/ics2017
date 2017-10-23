@@ -33,7 +33,7 @@ static int cmd_c(char *args) {
 }
 
 static int cmd_si(char *args) {
-  int step = 0;
+  int step = 1;
   step = atoi(args);
   if(0 == step){
     step = 1;
