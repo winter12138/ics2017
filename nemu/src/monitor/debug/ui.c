@@ -50,6 +50,14 @@ static int cmd_info(char *args) {
   }
   if(0 == strcmp(args, "r")) {
     printf("%-10s %#10x %10d\n", "eax", cpu.eax, cpu.eax);
+    printf("%-10s %#10x %10d\n", "ebx", cpu.ebx, cpu.ebx);
+    printf("%-10s %#10x %10d\n", "ecx", cpu.ecx, cpu.ecx);
+    printf("%-10s %#10x %10d\n", "edx", cpu.edx, cpu.edx);
+    printf("%-10s %#10x %10d\n", "esi", cpu.esi, cpu.esi);
+    printf("%-10s %#10x %10d\n", "edi", cpu.edi, cpu.edi);
+    printf("%-10s %#10x %10x\n", "ebp", cpu.ebp, cpu.ebp);
+    printf("%-10s %#10x %10x\n", "esp", cpu.esp, cpu.esp);
+    printf("%-10s %#10x %10x\n", "eip", cpu.eip, cpu.eip);
   }
   return 0;
 }
