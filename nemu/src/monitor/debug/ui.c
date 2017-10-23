@@ -73,7 +73,6 @@ static int cmd_x(char *args) {
     return 0;
   }
   N = atoi(arg);
-  printf("%s %d\n", arg, N);
   if(0 == N) {
     return 0;
   }
@@ -83,7 +82,6 @@ static int cmd_x(char *args) {
     return 0;
   }
   sscanf(arg, "%x", &expr);
-  printf("%s %d\n", arg, expr);
   if(0 == expr) {
     return 0;
   }
