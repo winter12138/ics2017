@@ -91,13 +91,14 @@ static int cmd_x(char *args) {
   for(i = 0; i < N; ++i, expr += 4) {
     value = vaddr_read(expr, 4);
     if(0 == i%4) {
-      printf("%-#10x: ", expr + 16*i);
+      printf("%-#10x: ", expr);
     }
     printf("%-#10x ", value);
     if(0 == (i+1)%4) {
       printf("\n");
     }
   }
+  printf("\n");
 
   return 0;
 }
