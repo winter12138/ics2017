@@ -44,6 +44,13 @@ static int cmd_si(char *args) {
   return 0;
 }
 
+static int cmd_info(char *args) {
+  if(0 == strcmp(args, "r")) {
+    printf("%-10s %10x %10d\n", "eax", cpu.eax, cpu.eax);
+  }
+  return 0;
+}
+
 static int cmd_q(char *args) {
   return -1;
 }
@@ -58,6 +65,7 @@ static struct {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "si", "\"si [N]\" , execute N instructions of the program(default N = 1)", cmd_si },
+  { "info", "\"info SUBCMD\" , info r: print register status; info w:print watchpoints' informations", cmd_info },
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
