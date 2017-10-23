@@ -82,7 +82,7 @@ static int cmd_x(char *args) {
   if(NULL == arg) {
     return 0;
   }
-  sscanf(arg, "%d", &expr);
+  sscanf(arg, "%x", &expr);
   printf("%s %d\n", arg, expr);
   if(0 == expr) {
     return 0;
