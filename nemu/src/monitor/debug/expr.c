@@ -8,7 +8,7 @@
 #include <string.h>
 
 enum {
-  TK_NOTYPE = 256, TK_EQ, TK_DEC
+  TK_NOTYPE = 256, TK_EQ, TK_DEC, TK_NEG, TK_DEREF
 
   /* TODO: Add more token types */
 
@@ -181,14 +181,8 @@ int eval(int p, int q) {
       for (i = p; i <= q; ++i)
       {
         switch(tokens[i].type) {
-          case '+': {
+          case '+': case '-':{
             if(0 == cnt) {
-              op = i;
-            }
-            break;
-          }
-          case '-': {
-            if(0 == cnt && (i == p || TK_DEC == tokens[i-1].type || ')' == tokens[i-1].type) ) {
               op = i;
             }
             break;
@@ -207,13 +201,28 @@ int eval(int p, int q) {
             --cnt;
             break;
           }
+          case TK_NEG: {
+            
+            break;
+          }
+          case TK_DEREF: {
+            
+            break;
+          }
+
           default: continue;
         }
       }
-      
-      if('-' == tokens[op].type && op == p) {
+
+      if(TK_NEG == tokens[op].type) {
+
         val2 = eval(op + 1, q);
         return -val2;
+      } else if(TK_DEREF == tokens[op].type) {
+
+        val2 = eval(op + 1, q);
+        val2 = vaddr_read(val2, 4);
+        return val2;
       }
 
       val1 = eval(p, op - 1);
@@ -233,7 +242,7 @@ int eval(int p, int q) {
   }
 }
 uint32_t expr(char *e, bool *success) {
-  int a;
+  int i, ans;
   if (!e || !make_token(e)) {
     *success = false;
     return 0;
@@ -241,13 +250,27 @@ uint32_t expr(char *e, bool *success) {
 
   /* TODO: Insert codes to evaluate the expression. */
   //TODO();
+  for (i = 0; i < nr_token; i ++) {
+    if (tokens[i].type == '-' 
+        && (i == 0 
+        || (tokens[i-1].type != TK_DEC && tokens[i-1].type != ')')
+        )) {
+      tokens[i].type = TK_NEG;
+    } else if (tokens[i].type == '*' 
+        && (i == 0 
+        || (tokens[i-1].type != TK_DEC && tokens[i-1].type != ')')
+        )) {
+      tokens[i].type = TK_DEREF;
+    }
+  }
+
   eval_flag = 0;
-  a = eval(0, nr_token-1);
+  ans = eval(0, nr_token-1);
   if(BADEXPR == eval_flag) {
     *success = false;
     return 0;
   } else {
     *success = true;
-    return a;
+    return ans;
   }
 }
