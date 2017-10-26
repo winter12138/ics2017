@@ -201,6 +201,12 @@ int eval(int p, int q) {
             --cnt;
             break;
           }
+          case TK_NEG: case TK_DEREF: {
+            if(0 == cnt && -1 == op) {
+              op = i;
+            }
+            break;
+          }
           default: continue;
         }
       }
