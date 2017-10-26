@@ -190,7 +190,7 @@ int eval(int p, int q) {
   }
   if(p > q) {
 
-    //eval_flag = BADEXPR;
+    eval_flag = BADEXPR;
     return 0;
   } else if (p == q) {
 
@@ -271,43 +271,35 @@ int eval(int p, int q) {
         }
       }
 
-      val1 = eval(p, op - 1);
-      val2 = eval(op + 1, q);
-
       if(TK_NOT == tokens[op].type
         || TK_NEG == tokens[op].type
         || TK_DEREF == tokens[op].type
         ) {
-
+        val1 = 0;
         val2 = eval(op + 1, q);
-        switch(tokens[op].type) {
-          case TK_NOT: return !val2;
-          case TK_NEG: return -val2;
-          case TK_DEREF: {
-            val2 = vaddr_read(val2, 4);
-            return val2;
-          }
-          default: {
-            eval_flag = BADEXPR;
-            return 0;
-          }
-        }
       } else {
         val1 = eval(p, op - 1);
         val2 = eval(op + 1, q);
-        switch(tokens[op].type) {
-          case '+': return val1 + val2;
-          case '-': return val1 - val2;
-          case '*': return val1 * val2;
-          case '/': return val1 / val2;
-          case TK_EQ:   return val1 == val2;
-          case TK_NEQ:  return val1 != val2;
-          case TK_AND:  return val1 && val2;
-          case TK_OR:   return val1 || val2;
-          default: {
-            eval_flag = BADEXPR;
-            return 0;
-          }
+      }
+
+      switch(tokens[op].type) {
+        case TK_NOT: return !val2;
+        case TK_NEG: return -val2;
+        case TK_DEREF: {
+          val2 = vaddr_read(val2, 4);
+          return val2;
+        }
+        case '+': return val1 + val2;
+        case '-': return val1 - val2;
+        case '*': return val1 * val2;
+        case '/': return val1 / val2;
+        case TK_EQ:   return val1 == val2;
+        case TK_NEQ:  return val1 != val2;
+        case TK_AND:  return val1 && val2;
+        case TK_OR:   return val1 || val2;
+        default: {
+          eval_flag = BADEXPR;
+          return 0;
         }
       }
 
