@@ -107,7 +107,7 @@ static int cmd_p(char *args) {
 
   a = expr(args, &success);
   if(true == success) {
-    printf("%#x\n", a);
+    printf("%d\n", a);
   } else {
     printf("Bad expression\n");
   }
