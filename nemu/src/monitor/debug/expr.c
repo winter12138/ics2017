@@ -116,14 +116,119 @@ static bool make_token(char *e) {
   return true;
 }
 
+enum { BADEXPR = -3, NOTSURD, NOTMATCH};
+
+int check_parentheses(int p, int q) {
+  int i, cnt = 0;
+  int notmatch = 0, notsurd = 0;
+  if('(' != tokens[p].type || ')' != tokens[q].type) {
+    notsurd = 1;
+  }
+  for (i = p; i <= q; ++i) {
+    if('(' == tokens[i].type) {
+      ++cnt;
+    } else if(')' == tokens[i].type) {
+      --cnt;
+      if(cnt < 0) {
+        return BADEXPR;
+      } else if(0 == cnt && i < q) {
+        notmatch = 1;
+      }
+    }
+  }
+  if(0 != cnt) {
+    return BADEXPR;
+  }
+  if(notsurd) {
+    return NOTSURD;
+  }
+  if(notmatch) {
+    return NOTMATCH;
+  }
+  return true;
+}
+
+static int eval_flag  = 0;
+int eval(int p, int q) {
+  int i, a, check_result;
+  int found, op, val1, val2;
+  if(BADEXPR == eval_flag) {
+    return 0;
+  }
+  if(p > q) {
+
+    eval_flag = BADEXPR;
+    return 0;
+  } else if (p == q) {
+
+    sscanf(tokens[p].str, "%i", &a);
+    return a;
+  } else {
+
+    check_result = check_parentheses(p, q);
+    if(true == check_result) {
+
+      return eval(p + 1, q - 1);
+    } else if(BADEXPR == check_result) {
+
+      eval_flag = BADEXPR;
+      return 0;
+    } else {
+
+      op = -1;
+      found = 0;
+
+      for (i = p; i <= q && !found; ++i)
+      {
+        switch(tokens[i].type) {
+          case '+': case '-': {
+            op = i;
+            break;
+          }
+          case '*': case '/': {
+            if(-1 == op || '*' == tokens[op].type || '/' == tokens[op].type) {
+              op = i;
+              break;
+            }
+          }
+          case '(': {
+            found = 1;
+            break;
+          }
+          default: continue;
+        }
+      }
+      val1 = eval(p, op - 1);
+      val2 = eval(op + 1, q);
+      switch(tokens[op].type) {
+        case '+': return val1 + val2;
+        case '-': return val1 - val2;
+        case '*': return val1 * val2;
+        case '/': return val1 / val2;
+        default: {
+          eval_flag = BADEXPR;
+          return 0;
+        }
+      }
+
+    }
+  }
+}
 uint32_t expr(char *e, bool *success) {
+  int a;
   if (!make_token(e)) {
     *success = false;
     return 0;
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
-
-  return 0;
+  //TODO();
+  eval_flag = 0;
+  a = eval(0, nr_token-1);
+  if(BADEXPR == eval_flag) {
+    *success = false;
+    return 0;
+  } else {
+    return a;
+  }
 }

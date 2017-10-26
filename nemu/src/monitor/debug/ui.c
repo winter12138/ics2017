@@ -101,6 +101,17 @@ static int cmd_x(char *args) {
   return 0;
 }
 
+static int cmd_p(char *args) {
+  bool success;
+  int a = expr(args, &success);
+  if(true == success) {
+    printf("%d\n", a);
+  } else {
+    printf("Bad expression\n");
+  }
+  return 0;
+}
+
 static int cmd_q(char *args) {
   return -1;
 }
@@ -116,6 +127,7 @@ static struct {
   { "c", "Continue the execution of the program", cmd_c },
   { "si", "\"si [N]\" , execute N instructions of the program(default N = 1)", cmd_si },
   { "info", "\"info SUBCMD\" , info r: print register status; info w:print watchpoints' informations", cmd_info },
+  { "p", "\"p EXPR\" , Find the value of the expression EXPR", cmd_p },
   { "x", "\"x N EXPR\" , Find the value of the expression EXPR, the result as the starting memory address, in the form of hexadecimal output of the four N bytes", cmd_x },
   { "q", "Exit NEMU", cmd_q },
 
