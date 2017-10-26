@@ -229,7 +229,9 @@ int eval(int p, int q) {
             }
             break;
           }
-          default: {
+          case '+': case '-': case '*': case '/':
+          case TK_EQ: case TK_NEQ:
+          case TK_AND: case TK_OR: {
             if(0 == cnt && (-1 == op 
               || tokens[i].priority >= tokens[op].priority
               )) {
@@ -237,7 +239,7 @@ int eval(int p, int q) {
             }
           }
         }
-        
+
       }
 
       if(TK_NOT == tokens[op].type
