@@ -194,9 +194,33 @@ int eval(int p, int q) {
     eval_flag = BADEXPR;
     return 0;
   } else if (p == q) {
-
-    sscanf(tokens[p].str, "%i", &a);
-    return a;
+    if('$' == tokens[p].str[0]) {
+      if(0 == strcmp("$eax", tokens[p].str)) {
+        return cpu.eax;
+      } else if(0 == strcmp("$ebx", tokens[p].str)) {
+        return cpu.ebx;
+      } else if(0 == strcmp("$ecx", tokens[p].str)) {
+        return cpu.ecx;
+      } else if(0 == strcmp("$edx", tokens[p].str)) {
+        return cpu.edx;
+      } else if(0 == strcmp("$esi", tokens[p].str)) {
+        return cpu.esi;
+      } else if(0 == strcmp("$edi", tokens[p].str)) {
+        return cpu.edi;
+      } else if(0 == strcmp("$esp", tokens[p].str)) {
+        return cpu.esp;
+      } else if(0 == strcmp("$ebp", tokens[p].str)) {
+        return cpu.ebp;
+      } else if(0 == strcmp("$eip", tokens[p].str)) {
+        return cpu.eip;
+      } else {
+        eval_flag = BADEXPR;
+        return 0;
+      }
+    } else {
+      sscanf(tokens[p].str, "%i", &a);
+      return a;
+    }
   } else {
 
     check_result = check_parentheses(p, q);
@@ -237,6 +261,7 @@ int eval(int p, int q) {
               )) {
               op = i;
             }
+            break;
           }
         }
 
