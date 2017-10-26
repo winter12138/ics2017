@@ -212,8 +212,8 @@ int eval(int p, int q) {
       op = -1;
       cnt = 0;
 
-      for (i = p; i <= q; ++i)
-      {
+      for (i = p; i <= q; ++i) {
+
         switch(tokens[i].type) {
           case '(': {
             ++cnt;
@@ -229,47 +229,15 @@ int eval(int p, int q) {
             }
             break;
           }
-          case '*': case '/': {
+          default: {
             if(0 == cnt && (-1 == op 
-              || tokens[i].priority >= tokens[op].type
+              || tokens[i].priority >= tokens[op].priority
               )) {
               op = i;
             }
-            break;
-          }
-          case '+': case '-':{
-            if(0 == cnt && (-1 == op 
-              || tokens[i].priority >= tokens[op].type
-              )) {
-              op = i;
-            }
-            break;
-          }
-          case TK_EQ: case TK_NEQ: {
-            if(0 == cnt && (-1 == op 
-              || tokens[i].priority >= tokens[op].type
-              )) {
-              op = i;
-            }
-            break;
-          }
-          case TK_AND: {
-            if(0 == cnt && (-1 == op 
-              || tokens[i].priority >= tokens[op].type
-              )) {
-              op = i;
-            }
-            break;
-          }
-          case TK_OR: {
-            if(0 == cnt && (-1 == op 
-              || tokens[i].priority >= tokens[op].type
-              )) {
-              op = i;
-            }
-            break;
           }
         }
+        
       }
 
       if(TK_NOT == tokens[op].type
