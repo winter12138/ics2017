@@ -181,8 +181,14 @@ int eval(int p, int q) {
       for (i = p; i <= q; ++i)
       {
         switch(tokens[i].type) {
-          case '+': case '-': {
+          case '+': {
             if(0 == cnt) {
+              op = i;
+            }
+            break;
+          }
+          case '-': {
+            if(0 == cnt && (i == p || TK_DEC == tokens[i-1].type || ')' == tokens[i-1].type) ) {
               op = i;
             }
             break;
@@ -204,6 +210,12 @@ int eval(int p, int q) {
           default: continue;
         }
       }
+      
+      if('-' == tokens[op].type && op == p) {
+        val2 = eval(op + 1, q);
+        return -val2;
+      }
+
       val1 = eval(p, op - 1);
       val2 = eval(op + 1, q);
       switch(tokens[op].type) {
