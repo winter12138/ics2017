@@ -151,7 +151,7 @@ int check_parentheses(int p, int q) {
 static int eval_flag  = 0;
 int eval(int p, int q) {
   int i, a, check_result;
-  int found, op, val1, val2;
+  int cnt, op, val1, val2;
   if(BADEXPR == eval_flag) {
     return 0;
   }
@@ -176,23 +176,29 @@ int eval(int p, int q) {
     } else {
 
       op = -1;
-      found = 0;
+      cnt = 0;
 
-      for (i = p; i <= q && !found; ++i)
+      for (i = p; i <= q; ++i)
       {
         switch(tokens[i].type) {
           case '+': case '-': {
-            op = i;
+            if(0 == cnt) {
+              op = i;
+            }
             break;
           }
           case '*': case '/': {
-            if(-1 == op || '*' == tokens[op].type || '/' == tokens[op].type) {
+            if(0 == cnt && (-1 == op || '*' == tokens[op].type || '/' == tokens[op].type)) {
               op = i;
-              break;
             }
+            break;
           }
           case '(': {
-            found = 1;
+            ++cnt;
+            break;
+          }
+          case ')': {
+            --cnt;
             break;
           }
           default: continue;
