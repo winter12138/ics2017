@@ -104,24 +104,10 @@ static int cmd_x(char *args) {
 static int cmd_p(char *args) {
   bool success;
   int a;
-  char *arg, *fmt="%d\n";
 
-  arg = strtok(NULL, " ");
-  if(NULL == arg) {
-    return 0;
-  }
-
-  if(0 == strcmp("x", arg)) {
-    arg = strtok(NULL, " ");
-    if(NULL == arg) {
-      return 0;
-    }
-    fmt = "%#x\n";
-  }
-
-  a = expr(arg, &success);
+  a = expr(args, &success);
   if(true == success) {
-    printf(fmt, a);
+    printf("%#x\n", a);
   } else {
     printf("Bad expression\n");
   }
