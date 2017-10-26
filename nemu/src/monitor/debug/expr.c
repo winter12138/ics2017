@@ -201,15 +201,6 @@ int eval(int p, int q) {
             --cnt;
             break;
           }
-          case TK_NEG: {
-            
-            break;
-          }
-          case TK_DEREF: {
-            
-            break;
-          }
-
           default: continue;
         }
       }
