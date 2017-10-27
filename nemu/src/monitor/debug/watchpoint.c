@@ -65,8 +65,8 @@ void check_wps(void) {
 		} else if(new_value != wp->value){
 			nemu_state = NEMU_STOP;
 			printf("Watchpoint %d: %s\n", wp->NO, wp->str);
-			printf("Old value = %d\n", wp->value);
-			printf("New value = %d\n\n", new_value);
+			printf("Old value = %-#10x %-10d\n", wp->value, wp->value);
+			printf("New value = %-#10x %-10d\n\n", new_value, new_value);
 			wp->value = new_value;
 		}
 	}
