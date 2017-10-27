@@ -206,6 +206,7 @@ static int cmd_help(char *args) {
 
 #define OLD_LEN 256
 static char old_cmd[OLD_LEN] = "";
+static char buf[OLD_LEN] = "";
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {
@@ -216,7 +217,8 @@ void ui_mainloop(int is_batch_mode) {
   while (1) {
     char *str = rl_gets();
     if(NULL == str) {
-      str = old_cmd;
+      strcpy(buf, old_cmd);
+      str = buf;
     } else if(strlen(str)>OLD_LEN-1) {
       printf("cmd too long\n");
       continue;
