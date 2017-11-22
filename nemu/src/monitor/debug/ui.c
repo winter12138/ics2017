@@ -3,6 +3,7 @@
 #include "monitor/watchpoint.h"
 #include "nemu.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -27,16 +28,137 @@ char* rl_gets() {
   return line_read;
 }
 
+static int cmd_help(char *args);
+
 static int cmd_c(char *args) {
   cpu_exec(-1);
+  return 0;
+}
+
+static int cmd_si(char *args) {
+  int step = 1;
+  if(args){
+    step = atoi(args);
+  }
+  if(0 == step){
+    step = 1;
+  }
+  cpu_exec(step);
+  return 0;
+}
+
+static int cmd_info(char *args) {
+  if(NULL == args) {
+    return 0;
+  }
+  if(strstr(args, "r")) {
+    printf("%-10s %-#10x %-10d\n", "eax", cpu.eax, cpu.eax);
+    printf("%-10s %-#10x %-10d\n", "ebx", cpu.ebx, cpu.ebx);
+    printf("%-10s %-#10x %-10d\n", "ecx", cpu.ecx, cpu.ecx);
+    printf("%-10s %-#10x %-10d\n", "edx", cpu.edx, cpu.edx);
+    printf("%-10s %-#10x %-10d\n", "esi", cpu.esi, cpu.esi);
+    printf("%-10s %-#10x %-10d\n", "edi", cpu.edi, cpu.edi);
+    printf("%-10s %-#10x %-#10x\n", "ebp", cpu.ebp, cpu.ebp);
+    printf("%-10s %-#10x %-#10x\n", "esp", cpu.esp, cpu.esp);
+    printf("%-10s %-#10x %-#10x\n", "eip", cpu.eip, cpu.eip);
+  } else if(strstr(args, "w")) {
+    list_wps();
+  }
+  return 0;
+}
+
+static int cmd_p(char *args) {
+  bool success;
+  uint32_t value;
+
+  value = expr(args, &success);
+  if(true == success) {
+    printf("%-#10x %-10d\n", value, value);
+  } else {
+    printf("Bad expression\n");
+  }
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  char *arg;
+  int i, N;
+  bool success;
+  uint32_t value, addr;
+
+  arg = strtok(NULL, " ");
+  if(NULL == arg) {
+    return 0;
+  }
+  N = atoi(arg);
+  if(0 == N) {
+    return 0;
+  }
+
+  arg = strtok(NULL, " ");
+  if(NULL == arg) {
+    return 0;
+  }
+  addr = expr(arg, &success);
+  if(false == success) {
+    printf("Bad expression\n");
+    return 0;
+  }
+  for(i = 0; i < N; ++i, addr += 4) {
+    value = vaddr_read(addr, 4);
+    if(0 == i%4) {
+      printf("%-#10x: ", addr);
+    }
+    printf("%0#10x ", value);
+    if(0 == (i+1)%4) {
+      printf("\n");
+    }
+  }
+  printf("\n");
+
+  return 0;
+}
+
+static int cmd_w(char *args) {
+  bool success;
+  uint32_t value;
+  WP *wp;
+
+  value = expr(args, &success);
+  if(false == success) {
+    printf("Bad expression\n");
+    return 0;
+  }
+
+  wp = new_wp();
+  if(!wp) {
+    return 0;
+  }
+  strcpy(wp->str, args);
+  wp->value = value;
+  printf("Watchpoint %d: %s\n", wp->NO, wp->str);
+
+  return 0;
+}
+
+static int cmd_d(char *args) {
+  int no;
+  if(!args){
+    return 0;
+  }
+  no = atoi(args);
+  if(!no){
+    return 0;
+  }
+  if(!delete_wp(no)) {
+    printf("fail to delete watchpoint %d\n", no);
+  }
   return 0;
 }
 
 static int cmd_q(char *args) {
   return -1;
 }
-
-static int cmd_help(char *args);
 
 static struct {
   char *name;
@@ -45,7 +167,13 @@ static struct {
 } cmd_table [] = {
   { "help", "Display informations about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
-  { "q", "Exit NEMU", cmd_q },
+  { "si", "\"si [N]\"\n\t Execute N instructions of the program and then suspend it(default N = 1)", cmd_si },
+  { "info", "\"info SUBCMD\"\n\t Info r: print register status; info w:print watchpoints' informations", cmd_info },
+  { "p", "\"p EXPR\"\n\t Find the value of the expression EXPR", cmd_p },
+  { "x", "\"x N EXPR\"\n\t Find the value of the expression EXPR, the result as the starting memory address, in the form of hexadecimal output of the four N bytes", cmd_x },
+  { "w", "\"w EXPR\"\n\t When the value of the expression EXPR changes, the program is suspended", cmd_w },
+  { "d", "\"d N\"\n\t Delete the watchpoint with the serial number N", cmd_d },
+  { "q", "Exit NEMU", cmd_q }
 
   /* TODO: Add more commands */
 
