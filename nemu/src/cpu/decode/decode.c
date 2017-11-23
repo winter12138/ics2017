@@ -315,3 +315,11 @@ make_DHelper(call) {
   id_dest->type = OP_TYPE_IMM;
   rtl_addi(&id_dest->val, &id_src->val, *eip);
 }
+
+make_DHelper(push_r) {
+  decode_op_r(eip, id_src, true);
+}
+
+make_DHelper(pop_r) {
+  decode_op_r(eip, id_dest, false);
+}
