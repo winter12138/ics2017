@@ -117,6 +117,7 @@ make_DHelper(mov_G2E) {
   decode_op_rm(eip, id_dest, false, id_src, true);
 }
 
+
 /* Gb <- Eb
  * Gv <- Ev
  */
@@ -314,6 +315,11 @@ make_DHelper(call) {
   decode_op_I(eip, id_src, true);
   id_dest->type = OP_TYPE_IMM;
   rtl_addi(&id_dest->val, &id_src->val, *eip);
+}
+
+make_DHelper(ret) {
+  id_dest->type = OP_TYPE_IMM;
+  rtl_pop(&id_dest->val);
 }
 
 make_DHelper(push_r) {
