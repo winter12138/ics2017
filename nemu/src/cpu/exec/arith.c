@@ -7,7 +7,20 @@ make_EHelper(add) {
 }
 
 make_EHelper(sub) {
+  rtl_slt(&t0, &id_dest->val, &id_src->val);
+  rtl_set_CF(&t0);
+  rtl_msb(&t0, &id_dest->val, id_dest->width);
+  rtl_msb(&t1, &id_src->val, id_src->width);
   rtl_subi(&id_dest->val, &id_dest->val, id_src->val);
+  rtl_msb(&t2, &id_dest->val, id_dest->width);
+  operand_write(id_dest, &id_dest->val);
+  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  if(t0 != t1 && t2 == t1) {
+    t3 = 1;
+    rtl_set_OF(&t3);
+  } else {
+    rtl_set_OF(&tzero);
+  }
 
   print_asm_template2(sub);
 }
