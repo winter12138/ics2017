@@ -61,11 +61,11 @@ static int cmd_info(char *args) {
     printf("%-10s %-#10x %-#10x\n", "ebp", cpu.ebp, cpu.ebp);
     printf("%-10s %-#10x %-#10x\n", "esp", cpu.esp, cpu.esp);
     printf("%-10s %-#10x %-#10x\n", "eip", cpu.eip, cpu.eip);
-    printf("%-10s %-10d\n", "CF", cpu.eflags.CF);
-    printf("%-10s %-10d\n", "ZF", cpu.eflags.ZF);
-    printf("%-10s %-10d\n", "SF", cpu.eflags.SF);
-    printf("%-10s %-10d\n", "IF", cpu.eflags.IF);
-    printf("%-10s %-10d\n", "OF", cpu.eflags.OF);
+    printf("%-10s %-10d\n", "CF", cpu.CF);
+    printf("%-10s %-10d\n", "ZF", cpu.ZF);
+    printf("%-10s %-10d\n", "SF", cpu.SF);
+    printf("%-10s %-10d\n", "IF", cpu.IF);
+    printf("%-10s %-10d\n", "OF", cpu.OF);
   } else if(strstr(args, "w")) {
     list_wps();
   }
