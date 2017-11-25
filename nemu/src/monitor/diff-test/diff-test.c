@@ -151,7 +151,7 @@ void difftest_step(uint32_t eip) {
   // Set `diff` as `true` if they are not the same.
   if(r.eax != cpu.eax || r.ecx != cpu.ecx || r.edx != cpu.edx || r.ebx != cpu.ebx
     || r.esp != cpu.esp || r.ebp != cpu.ebp || r.esi != cpu.esi || r.edi != cpu.edi
-    || r.eip != cpu.eip || r.eflags != cpu.eflags)
+    || r.eflags != cpu.eflags)
   {
     diff = true;
   }
