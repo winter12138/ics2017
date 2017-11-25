@@ -155,6 +155,7 @@ void difftest_step(uint32_t eip) {
     || r.eip != cpu.eip || r.eflags != cpu.eflags)
   {
     diff = true;
+    printf("The states of nemu and qemu are inconsistent.\n");
     printf("%-10s %-#10x %-10s %-#10x\n", "r.eax", r.eax, "cpu.eax", cpu.eax);
     printf("%-10s %-#10x %-10s %-#10x\n", "r.ecx", r.ecx, "cpu.ecx", cpu.ecx);
     printf("%-10s %-#10x %-10s %-#10x\n", "r.edx", r.edx, "cpu.edx", cpu.edx);
@@ -169,6 +170,5 @@ void difftest_step(uint32_t eip) {
 
   if (diff) {
     nemu_state = NEMU_END;
-    printf("The states of nemu and qemu are inconsistent.\n");
   }
 }

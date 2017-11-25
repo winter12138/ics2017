@@ -76,6 +76,7 @@ typedef void (*DHelper) (vaddr_t *);
 
 make_DHelper(I2E);
 make_DHelper(I2a);
+make_DHelper(r2a);
 make_DHelper(I2r);
 make_DHelper(SI2E);
 make_DHelper(SI_E2G);
@@ -84,6 +85,7 @@ make_DHelper(I_G2E);
 make_DHelper(I);
 make_DHelper(r);
 make_DHelper(E);
+make_DHelper(setcc_E);
 make_DHelper(gp7_E);
 make_DHelper(test_I);
 make_DHelper(SI);
@@ -94,6 +96,10 @@ make_DHelper(mov_I2r);
 make_DHelper(mov_I2E);
 make_DHelper(mov_G2E);
 make_DHelper(mov_E2G);
+make_DHelper(mov_Eb2G);
+make_DHelper(mov_Ew2G);
+make_DHelper(mov_SEb2G);
+make_DHelper(mov_SEw2G);
 make_DHelper(lea_M2G);
 
 make_DHelper(gp2_1_E);
@@ -104,8 +110,8 @@ make_DHelper(O2a);
 make_DHelper(a2O);
 
 make_DHelper(J);
+make_DHelper(jcc);
 make_DHelper(call);
-make_DHelper(ret);
 
 make_DHelper(push_SI);
 make_DHelper(push_r);

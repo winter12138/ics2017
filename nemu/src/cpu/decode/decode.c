@@ -28,7 +28,7 @@ static inline make_DopHelper(I) {
  */
 /* sign immediate */
 static inline make_DopHelper(SI) {
-  assert(op->width == 1 || op->width == 4);
+//  assert(op->width == 1 || op->width == 4);
 
   op->type = OP_TYPE_IMM;
 
@@ -39,7 +39,7 @@ static inline make_DopHelper(SI) {
    op->simm = ???
    */
   op->simm = instr_fetch(eip, op->width);
-
+  rtl_sext((rtlreg_t*)&op->simm, (rtlreg_t*)&op->simm, op->width);
   rtl_li(&op->val, op->simm);
 
 #ifdef DEBUG
@@ -129,6 +129,28 @@ make_DHelper(mov_E2G) {
   decode_op_rm(eip, id_src, true, id_dest, false);
 }
 
+make_DHelper(mov_Eb2G) {
+  id_src->width = 1;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+}
+
+make_DHelper(mov_Ew2G) {
+  id_src->width = 2;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+}
+
+make_DHelper(mov_SEb2G) {
+  id_src->width = 1;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
+}
+
+make_DHelper(mov_SEw2G) {
+  id_src->width = 2;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
+}
+
 make_DHelper(lea_M2G) {
   decode_op_rm(eip, id_src, false, id_dest, false);
 }
@@ -139,6 +161,14 @@ make_DHelper(lea_M2G) {
 make_DHelper(I2a) {
   decode_op_a(eip, id_dest, true);
   decode_op_I(eip, id_src, true);
+}
+
+/* AX <-> XX
+ * eAX <-> eXX
+ */
+make_DHelper(r2a) {
+  decode_op_a(eip, id_dest, true);
+  decode_op_r(eip, id_src, true);
 }
 
 /* Gv <- EvIb
@@ -189,6 +219,10 @@ make_DHelper(E) {
 }
 
 make_DHelper(gp7_E) {
+  decode_op_rm(eip, id_dest, false, NULL, false);
+}
+
+make_DHelper(setcc_E) {
   decode_op_rm(eip, id_dest, false, NULL, false);
 }
 
@@ -267,6 +301,14 @@ make_DHelper(J) {
   decoding.jmp_eip = id_dest->simm + *eip;
 }
 
+make_DHelper(jcc) {
+  decode_op_SI(eip, id_dest, false);
+  // the target address can be computed in the decode stage
+  decoding.jmp_eip = id_dest->simm + *eip;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
+}
+
 make_DHelper(push_SI) {
   decode_op_SI(eip, id_dest, true);
 }
@@ -312,13 +354,9 @@ void operand_write(Operand *op, rtlreg_t* src) {
 }
 
 make_DHelper(call) {
-  decode_op_I(eip, id_src, true);
-  id_src->val += *eip;
-}
-
-make_DHelper(ret) {
-  id_src->type = OP_TYPE_IMM;
-  rtl_pop(&id_src->val);
+  decode_op_I(eip, id_dest, true);
+  id_dest->val += *eip;
+  decoding.jmp_eip = id_dest->val;
 }
 
 make_DHelper(push_r) {
