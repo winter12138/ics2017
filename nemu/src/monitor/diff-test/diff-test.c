@@ -16,9 +16,11 @@ void gdb_exit(void);
 
 static bool is_skip_qemu;
 static bool is_skip_nemu;
+static bool is_skip_eflags;
 
 void diff_test_skip_qemu() { is_skip_qemu = true; }
 void diff_test_skip_nemu() { is_skip_nemu = true; }
+void diff_test_skip_eflags() { is_skip_eflags = true; }
 
 #define regcpy_from_nemu(regs) \
   do { \
@@ -129,6 +131,7 @@ void init_qemu_reg() {
 void difftest_step(uint32_t eip) {
   union gdb_regs r;
   bool diff = false;
+  uint32_t mask;
 
   if (is_skip_nemu) {
     is_skip_nemu = false;
@@ -149,10 +152,15 @@ void difftest_step(uint32_t eip) {
 
   // TODO: Check the registers state with QEMU.
   // Set `diff` as `true` if they are not the same.
-  r.eflags &= 0xac3;
+  if(is_skip_eflags){
+    mask = 0x0;
+    is_skip_eflags = false;
+  } else {
+    mask = 0xac1;
+  }
   if(r.eax != cpu.eax || r.ecx != cpu.ecx || r.edx != cpu.edx || r.ebx != cpu.ebx
     || r.esp != cpu.esp || r.ebp != cpu.ebp || r.esi != cpu.esi || r.edi != cpu.edi
-    || r.eip != cpu.eip || r.eflags != cpu.eflags)
+    || r.eip != cpu.eip || (r.eflags & mask) != (cpu.eflags & mask))
   {
     diff = true;
     printf("The states of nemu and qemu are inconsistent.\n");

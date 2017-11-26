@@ -1,4 +1,5 @@
 #include "cpu/exec.h"
+void diff_test_skip_eflags();
 
 make_EHelper(test) {
   rtl_and(&t0, &id_dest->val, &id_src->val);
@@ -49,6 +50,10 @@ make_EHelper(sar) {
   // unnecessary to update CF and OF in NEMU
 
   print_asm_template2(sar);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(shl) {
@@ -57,6 +62,10 @@ make_EHelper(shl) {
   // unnecessary to update CF and OF in NEMU
 
   print_asm_template2(shl);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(shr) {
@@ -65,6 +74,10 @@ make_EHelper(shr) {
   // unnecessary to update CF and OF in NEMU
 
   print_asm_template2(shr);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(setcc) {
