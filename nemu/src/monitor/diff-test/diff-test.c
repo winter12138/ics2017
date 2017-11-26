@@ -151,16 +151,11 @@ void difftest_step(uint32_t eip) {
 
   // TODO: Check the registers state with QEMU.
   // Set `diff` as `true` if they are not the same.
-  if(is_skip_eflags){
-    r.eflags &= 0x0;
-    cpu.eflags &= 0x0;
-    is_skip_eflags = false;
-  } else {
-    r.eflags &= 0xac3;
-  }
+  r.eflags &= 0xac3;
+
   if(r.eax != cpu.eax || r.ecx != cpu.ecx || r.edx != cpu.edx || r.ebx != cpu.ebx
     || r.esp != cpu.esp || r.ebp != cpu.ebp || r.esi != cpu.esi || r.edi != cpu.edi
-    || r.eip != cpu.eip || r.eflags != cpu.eflags)
+    || r.eip != cpu.eip || ( !is_skip_eflags && r.eflags != cpu.eflags))
   {
     diff = true;
     printf("The states of nemu and qemu are inconsistent.\n");
@@ -174,7 +169,9 @@ void difftest_step(uint32_t eip) {
     printf("%-10s %-#10x %-10s %-#10x\n", "r.edi", r.edi, "cpu.edi", cpu.edi);
     printf("%-10s %-#10x %-10s %-#10x\n", "r.eip", r.eip, "cpu.eip", cpu.eip);
     printf("%-10s %-#10x %-10s %-#10x\n", "r.eflags", r.eflags, "cpu.eflags", cpu.eflags);
- }
+  }
+
+  is_skip_eflags = false;
 
   if (diff) {
     nemu_state = NEMU_END;
