@@ -20,19 +20,46 @@ make_EHelper(pop) {
 }
 
 make_EHelper(pusha) {
-  TODO();
+  int width;
+  width = decoding.is_operand_size_16 ? 2 : 4;
+
+  rtl_lr(&t0, R_ESP, width);
+  rtl_push(&cpu.eax, width);
+  rtl_push(&cpu.ecx, width);
+  rtl_push(&cpu.edx, width);
+  rtl_push(&cpu.ebx, width);
+  rtl_push(&t0, width);
+  rtl_push(&cpu.ebp, width);
+  rtl_push(&cpu.esi, width);
+  rtl_push(&cpu.edi, width);
 
   print_asm("pusha");
 }
 
 make_EHelper(popa) {
-  TODO();
+  int width;
+  width = decoding.is_operand_size_16 ? 2 : 4;
+  
+  rtl_pop(&cpu.edi, width);
+  rtl_pop(&cpu.esi, width);
+  rtl_pop(&cpu.ebp, width);
+  rtl_pop(&t0, width);
+  rtl_pop(&cpu.ebx, width);
+  rtl_pop(&cpu.edx, width);
+  rtl_pop(&cpu.ecx, width);
+  rtl_pop(&cpu.eax, width);
 
   print_asm("popa");
 }
 
 make_EHelper(leave) {
-  TODO();
+  int width;
+  width = decoding.is_operand_size_16 ? 2 : 4;
+  
+  rtl_lr(&t0, R_EBP, width);
+  rtl_sr(R_ESP, width, &t0);
+  rtl_pop(&t0, width);
+  rtl_sr(R_EBP, width, &t0);
 
   print_asm("leave");
 }
@@ -58,16 +85,12 @@ make_EHelper(cltd) {
 }
 
 make_EHelper(cwtl) {
-  if (decoding.is_operand_size_16) {
-    rtl_lr(&t0, R_EAX, 1);
-    rtl_sext(&t0, &t0, 1);
-    rtl_sr(R_EAX, 2, &t0);
-  }
-  else {
-    rtl_lr(&t0, R_EAX, 2);
-    rtl_sext(&t0, &t0, 2);
-    rtl_sr(R_EAX, 4, &t0);
-  }
+  int width;
+  width = decoding.is_operand_size_16 ? 2 : 4;
+
+  rtl_lr(&t0, R_EAX, width>>1);
+  rtl_sext(&t0, &t0, width>>1);
+  rtl_sr(R_EAX, width, &t0);
 
   print_asm(decoding.is_operand_size_16 ? "cbtw" : "cwtl");
 }
