@@ -123,12 +123,13 @@ make_EHelper(cmp) {
 }
 
 make_EHelper(inc) {
-  rtl_addi(&t0, &id_dest->val, 1);
-  operand_write(id_dest, &t0);
+  rtl_addi(&t3, &id_dest->val, 1);
+  operand_write(id_dest, &t3);
 
-  rtl_update_ZFSF(&t0, id_dest->width);
+  rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_xor(&t0, &t0, &id_dest->val);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &id_dest->val, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
 
@@ -136,12 +137,14 @@ make_EHelper(inc) {
 }
 
 make_EHelper(dec) {
-  rtl_subi(&t0, &id_dest->val, 1);
-  operand_write(id_dest, &t0);
+  rtl_subi(&t3, &id_dest->val, 1);
+  operand_write(id_dest, &t3);
 
-  rtl_update_ZFSF(&t0, id_dest->width);
+  rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_xor(&t0, &t0, &id_dest->val);
+  rtl_xori(&t0, &id_dest->val, 1);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
 
