@@ -187,6 +187,10 @@ make_EHelper(mul) {
   }
 
   print_asm_template1(mul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with one operand
@@ -211,6 +215,10 @@ make_EHelper(imul1) {
   }
 
   print_asm_template1(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with two operands
@@ -222,6 +230,10 @@ make_EHelper(imul2) {
   operand_write(id_dest, &t1);
 
   print_asm_template2(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with three operands
@@ -234,6 +246,10 @@ make_EHelper(imul3) {
   operand_write(id_dest, &t1);
 
   print_asm_template3(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(div) {
@@ -267,6 +283,10 @@ make_EHelper(div) {
   }
 
   print_asm_template1(div);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(idiv) {
@@ -305,4 +325,8 @@ make_EHelper(idiv) {
   }
 
   print_asm_template1(idiv);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }

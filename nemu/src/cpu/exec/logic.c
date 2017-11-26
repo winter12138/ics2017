@@ -1,5 +1,4 @@
 #include "cpu/exec.h"
-void diff_test_skip_eflags();
 
 make_EHelper(test) {
   rtl_and(&t0, &id_dest->val, &id_src->val);
