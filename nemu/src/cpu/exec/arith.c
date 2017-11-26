@@ -128,8 +128,10 @@ make_EHelper(inc) {
 
   rtl_update_ZFSF(&t3, id_dest->width);
 
+  rtl_xori(&t0, &id_dest->val, 1);
+  rtl_not(&t0);
   rtl_xor(&t1, &id_dest->val, &t3);
-  rtl_and(&t0, &id_dest->val, &t1);
+  rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
 
