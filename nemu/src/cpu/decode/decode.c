@@ -15,7 +15,9 @@ static inline make_DopHelper(I) {
   /* eip here is pointing to the immediate */
   op->type = OP_TYPE_IMM;
   op->imm = instr_fetch(eip, op->width);
-  rtl_li(&op->val, op->imm);
+  if (load_val) {
+    rtl_li(&op->val, op->imm);
+  }
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->imm);
@@ -39,8 +41,12 @@ static inline make_DopHelper(SI) {
    op->simm = ???
    */
   op->simm = instr_fetch(eip, op->width);
-  rtl_sext((rtlreg_t*)&op->simm, (rtlreg_t*)&op->simm, op->width);
-  rtl_li(&op->val, op->simm);
+  rtl_sext((rtlreg_t*)&op->simm , (rtlreg_t*)&op->simm , op->width);
+
+  if (load_val) {
+    rtl_li(&op->val, op->simm);
+    rtl_sext(&op->val, &op->val, op->width);
+  }
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
@@ -296,15 +302,25 @@ make_DHelper(a2O) {
 }
 
 make_DHelper(J) {
-  decode_op_SI(eip, id_dest, false);
+  decode_op_SI(eip, id_dest, true);
   // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->simm + *eip;
+  decoding.jmp_eip = id_dest->val + *eip;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
+}
+
+make_DHelper(J_A) {
+  decode_op_SI(eip, id_dest, true);
+  // the target address can be computed in the decode stage
+  decoding.jmp_eip = id_dest->val;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
 }
 
 make_DHelper(jcc) {
-  decode_op_SI(eip, id_dest, false);
+  decode_op_SI(eip, id_dest, true);
   // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->simm + *eip;
+  decoding.jmp_eip = id_dest->val + *eip;
   if(decoding.is_operand_size_16)
     decoding.jmp_eip &= 0xffff;
 }
