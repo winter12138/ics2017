@@ -6,14 +6,15 @@ make_EHelper(mov) {
 }
 
 make_EHelper(push) {
-  rtl_push(&id_src->val);
+  id_dest->width = decoding.is_operand_size_16 ? 2 : 4;
+  rtl_push(&id_dest->val, id_dest->width);
 
   print_asm_template1(push);
 }
 
 make_EHelper(pop) {
-  rtl_pop(&id_src->val);
-  operand_write(id_dest, &id_src->val);
+  rtl_pop(&t0, id_dest->width);
+  operand_write(id_dest, &t0);
 
   print_asm_template1(pop);
 }

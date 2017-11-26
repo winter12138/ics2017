@@ -114,7 +114,6 @@ make_DHelper(jcc);
 make_DHelper(call);
 
 make_DHelper(push_SI);
-make_DHelper(push_r);
 make_DHelper(pop_r);
 
 make_DHelper(in_I2a);
