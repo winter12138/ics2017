@@ -110,7 +110,7 @@ make_DHelper(O2a);
 make_DHelper(a2O);
 
 make_DHelper(J);
-make_DHelper(J_A);
+make_DHelper(J_call_A);
 make_DHelper(jcc);
 make_DHelper(call);
 

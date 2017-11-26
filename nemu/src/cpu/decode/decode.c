@@ -309,7 +309,7 @@ make_DHelper(J) {
     decoding.jmp_eip &= 0xffff;
 }
 
-make_DHelper(J_A) {
+make_DHelper(J_call_A) {
   decode_op_SI(eip, id_dest, true);
   // the target address can be computed in the decode stage
   decoding.jmp_eip = id_dest->val;

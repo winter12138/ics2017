@@ -35,6 +35,8 @@ make_EHelper(call) {
 
 make_EHelper(call_rm) {
   decoding.jmp_eip = id_dest->val;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
   decoding.is_jmp = 1;
 
   print_asm("call *%s", id_dest->str);
