@@ -34,12 +34,21 @@ make_EHelper(adc) {
 
   rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
   rtl_sext(&id_src->val, &id_src->val, id_src->width);
-  rtl_mv(&t1, &tzero);
-  rtl_not(&t1);
-  rtl_sub(&t1, &t1, &t2);
-  rtl_sub(&t1, &t1, &id_src->val);
-  rtl_sltu(&t1, &t1, &id_dest->val);
-  rtl_set_CF(&t1);
+  rtl_mv(&t0, &tzero);
+  rtl_not(&t0);
+  rtl_sub(&t0, &t0, &id_src->val);
+  if(0 == t0) {
+    if(0 == t2 && 0 == id_dest->val) {
+      rtl_set_CF(&tzero);
+    } else {
+      t0 = 1;
+      rtl_set_CF(&t0);
+    }
+  } else {
+    rtl_sub(&t0, &t0, &t2);
+    rtl_sltu(&t0, &t0, &id_dest->val);
+    rtl_set_CF(&t0);
+  }
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_not(&t0);
@@ -57,9 +66,7 @@ make_EHelper(sub) {
 
   rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
-  rtl_sext(&id_src->val, &id_src->val, id_src->width);
-  rtl_slt(&t0, &id_dest->val, &id_src->val);
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
   rtl_set_CF(&t0);
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
@@ -79,11 +86,15 @@ make_EHelper(sbb) {
 
   rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_sext(&t0, &id_dest->val, id_dest->width);
-  rtl_sext(&t1, &id_src->val, id_src->width);
-  rtl_sub(&t0, &t0, &t2);
-  rtl_slt(&t0, &t0, &t1);
-  rtl_set_CF(&t0);
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
+  rtl_sltu(&t1, &id_src->val, &id_dest->val);
+  if(1 == t0) {
+    rtl_set_CF(&t0);
+  }else if(1== t1){
+    rtl_set_CF(&tzero);
+  } else {
+    rtl_set_CF(&t2);
+  }
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t3);
@@ -99,9 +110,7 @@ make_EHelper(cmp) {
 
   rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
-  rtl_sext(&id_src->val, &id_src->val, id_src->width);
-  rtl_slt(&t0, &id_dest->val, &id_src->val);
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
   rtl_set_CF(&t0);
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
