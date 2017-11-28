@@ -83,6 +83,39 @@ make_EHelper(shr) {
   #endif
 }
 
+make_EHelper(rol) {
+  rtl_mv(&t0, &id_src->val);
+  while(t0) {
+    rtl_msb(&t1, &id_dest->val, id_dest->width);
+    rtl_shli(&id_dest->val, &id_dest->val, 1);
+    rtl_add(&id_dest->val, &id_dest->val, &t1);
+    rtl_subi(&t0, &t0, 1);
+  }
+
+  print_asm_template2(rol);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
+}
+
+make_EHelper(ror) {
+  rtl_mv(&t0, &id_src->val);
+  while(t0) {
+    t1 = id_dest->val & 0x1;
+    rtl_shri(&id_dest->val, &id_dest->val, 1);
+    rtl_shli(&t1, &t1, id_dest->width << 3);
+    rtl_add(&id_dest->val, &id_dest->val, &t1);
+    rtl_subi(&t0, &t0, 1);
+  }
+
+  print_asm_template2(ror);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
+}
+
 make_EHelper(setcc) {
   uint8_t subcode = decoding.opcode & 0xf;
   rtl_setcc(&t2, subcode);
