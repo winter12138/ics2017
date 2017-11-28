@@ -16,9 +16,11 @@ void gdb_exit(void);
 
 static bool is_skip_qemu;
 static bool is_skip_nemu;
+static bool is_skip_eflags;
 
 void diff_test_skip_qemu() { is_skip_qemu = true; }
 void diff_test_skip_nemu() { is_skip_nemu = true; }
+void diff_test_skip_eflags() { is_skip_eflags = true; }
 
 #define regcpy_from_nemu(regs) \
   do { \
@@ -149,8 +151,29 @@ void difftest_step(uint32_t eip) {
 
   // TODO: Check the registers state with QEMU.
   // Set `diff` as `true` if they are not the same.
-  TODO();
+  r.eflags &= 0xac3;
+  if(is_skip_eflags) {
+    cpu.eflags = r.eflags;
+    is_skip_eflags = false;
+  }
 
+  if(r.eax != cpu.eax || r.ecx != cpu.ecx || r.edx != cpu.edx || r.ebx != cpu.ebx
+    || r.esp != cpu.esp || r.ebp != cpu.ebp || r.esi != cpu.esi || r.edi != cpu.edi
+    || r.eip != cpu.eip || r.eflags != cpu.eflags)
+  {
+    diff = true;
+    printf("The states of nemu and qemu are inconsistent.\n");
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.eax", r.eax, "cpu.eax", cpu.eax);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.ecx", r.ecx, "cpu.ecx", cpu.ecx);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.edx", r.edx, "cpu.edx", cpu.edx);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.ebx", r.ebx, "cpu.ebx", cpu.ebx);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.esp", r.esp, "cpu.esp", cpu.esp);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.ebp", r.ebp, "cpu.ebp", cpu.ebp);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.esi", r.esi, "cpu.esi", cpu.esi);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.edi", r.edi, "cpu.edi", cpu.edi);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.eip", r.eip, "cpu.eip", cpu.eip);
+    printf("%-10s %-#10x %-10s %-#10x\n", "r.eflags", r.eflags, "cpu.eflags", cpu.eflags);
+  }
   if (diff) {
     nemu_state = NEMU_END;
   }

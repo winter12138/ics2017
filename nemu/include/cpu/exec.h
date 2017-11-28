@@ -1,6 +1,10 @@
 #ifndef __CPU_EXEC_H__
 #define __CPU_EXEC_H__
 
+void diff_test_skip_qemu();
+void diff_test_skip_nemu();
+void diff_test_skip_eflags();
+
 #include "nemu.h"
 
 #define make_EHelper(name) void concat(exec_, name) (vaddr_t *eip)

@@ -15,7 +15,9 @@ static inline make_DopHelper(I) {
   /* eip here is pointing to the immediate */
   op->type = OP_TYPE_IMM;
   op->imm = instr_fetch(eip, op->width);
-  rtl_li(&op->val, op->imm);
+  if (load_val) {
+    rtl_li(&op->val, op->imm);
+  }
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->imm);
@@ -28,7 +30,7 @@ static inline make_DopHelper(I) {
  */
 /* sign immediate */
 static inline make_DopHelper(SI) {
-  assert(op->width == 1 || op->width == 4);
+//  assert(op->width == 1 || op->width == 4);
 
   op->type = OP_TYPE_IMM;
 
@@ -38,9 +40,13 @@ static inline make_DopHelper(SI) {
    *
    op->simm = ???
    */
-  TODO();
+  op->simm = instr_fetch(eip, op->width);
+  rtl_sext((rtlreg_t*)&op->simm , (rtlreg_t*)&op->simm , op->width);
 
-  rtl_li(&op->val, op->simm);
+  if (load_val) {
+    rtl_li(&op->val, op->simm);
+    rtl_sext(&op->val, &op->val, op->width);
+  }
 
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
@@ -117,6 +123,7 @@ make_DHelper(mov_G2E) {
   decode_op_rm(eip, id_dest, false, id_src, true);
 }
 
+
 /* Gb <- Eb
  * Gv <- Ev
  */
@@ -126,6 +133,28 @@ make_DHelper(E2G) {
 
 make_DHelper(mov_E2G) {
   decode_op_rm(eip, id_src, true, id_dest, false);
+}
+
+make_DHelper(mov_Eb2G) {
+  id_src->width = 1;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+}
+
+make_DHelper(mov_Ew2G) {
+  id_src->width = 2;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+}
+
+make_DHelper(mov_SEb2G) {
+  id_src->width = 1;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
+}
+
+make_DHelper(mov_SEw2G) {
+  id_src->width = 2;
+  decode_op_rm(eip, id_src, true, id_dest, false);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
 }
 
 make_DHelper(lea_M2G) {
@@ -138,6 +167,48 @@ make_DHelper(lea_M2G) {
 make_DHelper(I2a) {
   decode_op_a(eip, id_dest, true);
   decode_op_I(eip, id_src, true);
+}
+
+/* AL <- Ib
+ * eAX <- Ib
+ */
+make_DHelper(Ib2a) {
+  decode_op_a(eip, id_dest, false);
+  id_src->width = 1;
+  decode_op_I(eip, id_src, true);
+}
+
+/* Ib <- AL
+ * Ib <- eAX
+ */
+make_DHelper(a2Ib) {
+  id_dest->width = 1;
+  decode_op_I(eip, id_dest, true);
+  decode_op_a(eip, id_src, true);
+}
+
+/* AX <-> XX
+ * eAX <-> eXX
+ */
+make_DHelper(r2a) {
+  decode_op_a(eip, id_dest, true);
+  decode_op_r(eip, id_src, true);
+}
+
+/* AX <- DX
+ * eAX <- DX
+ */
+make_DHelper(dw2a) {
+  decode_op_a(eip, id_dest, false);
+  rtl_lr(&id_src->val, R_EDX, 2);
+}
+
+/* DX <- AX
+ * DX <- eAX
+ */
+make_DHelper(a2dw) {
+  rtl_lr(&id_dest->val, R_EDX, 2);
+  decode_op_a(eip, id_src, true);
 }
 
 /* Gv <- EvIb
@@ -188,6 +259,10 @@ make_DHelper(E) {
 }
 
 make_DHelper(gp7_E) {
+  decode_op_rm(eip, id_dest, false, NULL, false);
+}
+
+make_DHelper(setcc_E) {
   decode_op_rm(eip, id_dest, false, NULL, false);
 }
 
@@ -261,9 +336,27 @@ make_DHelper(a2O) {
 }
 
 make_DHelper(J) {
-  decode_op_SI(eip, id_dest, false);
+  decode_op_SI(eip, id_dest, true);
   // the target address can be computed in the decode stage
-  decoding.jmp_eip = id_dest->simm + *eip;
+  decoding.jmp_eip = id_dest->val + *eip;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
+}
+
+make_DHelper(J_call_A) {
+  decode_op_SI(eip, id_dest, true);
+  // the target address can be computed in the decode stage
+  decoding.jmp_eip = id_dest->val;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
+}
+
+make_DHelper(jcc) {
+  decode_op_SI(eip, id_dest, true);
+  // the target address can be computed in the decode stage
+  decoding.jmp_eip = id_dest->val + *eip;
+  if(decoding.is_operand_size_16)
+    decoding.jmp_eip &= 0xffff;
 }
 
 make_DHelper(push_SI) {
@@ -308,4 +401,14 @@ void operand_write(Operand *op, rtlreg_t* src) {
   if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }
   else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }
   else { assert(0); }
+}
+
+make_DHelper(call) {
+  decode_op_I(eip, id_dest, true);
+  id_dest->val += *eip;
+  decoding.jmp_eip = id_dest->val;
+}
+
+make_DHelper(pop_r) {
+  decode_op_r(eip, id_dest, false);
 }

@@ -24,8 +24,8 @@ static struct rule {
    */
 
   {" +", TK_NOTYPE},    // spaces
-  {"\\$e([abcd]x|[sd]i|[sb]p|ip)", TK_REG},   // hexadecimal
-  {"0[xX][0-9a-fA-F]+", TK_HEX},   // hexadecimal
+  {"\\$e([abcd]x|[sd]i|[sb]p|ip)", TK_REG},   // register
+  {"0[xX][0-9a-fA-F]+", TK_HEX},              // hexadecimal
   {"[0-9]+", TK_DEC},   // decimal
   {"\\(", '('},         // left bracket
   {"\\)", ')'},         // right bracket
@@ -36,7 +36,7 @@ static struct rule {
   {"==", TK_EQ},        // equal
   {"!=", TK_NEQ},       // not equal
   {"&&", TK_AND},       // and
-  {"\\|\\|", TK_OR},        // or
+  {"\\|\\|", TK_OR},    // or
   {"!", TK_NOT},        // not
 };
 #define NR_REGEX (sizeof(rules) / sizeof(rules[0]) )
@@ -85,8 +85,8 @@ static bool make_token(char *e) {
         char *substr_start = e + position;
         int substr_len = pmatch.rm_eo;
 
-        Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
-            i, rules[i].regex, position, substr_len, substr_len, substr_start);
+        //Log("match rules[%d] = \"%s\" at position %d with len %d: %.*s",
+        //    i, rules[i].regex, position, substr_len, substr_len, substr_start);
         position += substr_len;
 
         /* TODO: Now a new token is recognized with rules[i]. Add codes

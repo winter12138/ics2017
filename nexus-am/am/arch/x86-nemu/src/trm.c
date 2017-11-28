@@ -2,7 +2,7 @@
 #include <x86.h>
 
 // Define this macro after serial has been implemented
-//#define HAS_SERIAL
+#define HAS_SERIAL
 
 #define SERIAL_PORT 0x3f8
 
@@ -19,7 +19,7 @@ static void serial_init() {
 #ifdef HAS_SERIAL
   outb(SERIAL_PORT + 1, 0x00);
   outb(SERIAL_PORT + 3, 0x80);
-  outb(SERIAL_PORT + 0, 0x01);
+  outb(SERIAL_PORT + 0, 0x00);
   outb(SERIAL_PORT + 1, 0x00);
   outb(SERIAL_PORT + 3, 0x03);
   outb(SERIAL_PORT + 2, 0xC7);

@@ -1,55 +1,58 @@
 #include "cpu/exec.h"
 
 make_EHelper(add) {
-  TODO();
+  rtl_add(&t3, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t3);
 
-  print_asm_template2(add);
-}
+  rtl_update_ZFSF(&t3, id_dest->width);
 
-make_EHelper(sub) {
-  TODO();
-
-  print_asm_template2(sub);
-}
-
-make_EHelper(cmp) {
-  TODO();
-
-  print_asm_template2(cmp);
-}
-
-make_EHelper(inc) {
-  TODO();
-
-  print_asm_template1(inc);
-}
-
-make_EHelper(dec) {
-  TODO();
-
-  print_asm_template1(dec);
-}
-
-make_EHelper(neg) {
-  TODO();
-
-  print_asm_template1(neg);
-}
-
-make_EHelper(adc) {
-  rtl_add(&t2, &id_dest->val, &id_src->val);
-  rtl_get_CF(&t1);
-  rtl_add(&t2, &t2, &t1);
-  operand_write(id_dest, &t2);
-
-  rtl_update_ZFSF(&t2, id_dest->width);
-
-  rtl_sltu(&t0, &t2, &id_dest->val);
+  rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
+  rtl_mv(&t0, &tzero);
+  rtl_not(&t0);
+  rtl_sub(&t0, &t0, &id_src->val);
+  rtl_sltu(&t0, &t0, &id_dest->val);
   rtl_set_CF(&t0);
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_not(&t0);
-  rtl_xor(&t1, &id_dest->val, &t2);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
+
+  print_asm_template2(add);
+}
+
+make_EHelper(adc) {
+  rtl_add(&t3, &id_dest->val, &id_src->val);
+  rtl_get_CF(&t2);
+  rtl_add(&t3, &t3, &t2);
+  operand_write(id_dest, &t3);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_sext(&id_dest->val, &id_dest->val, id_dest->width);
+  rtl_sext(&id_src->val, &id_src->val, id_src->width);
+  rtl_mv(&t0, &tzero);
+  rtl_not(&t0);
+  rtl_sub(&t0, &t0, &id_src->val);
+  if(0 == t0) {
+    if(0 == t2 && 0 == id_dest->val) {
+      rtl_set_CF(&tzero);
+    } else {
+      t0 = 1;
+      rtl_set_CF(&t0);
+    }
+  } else {
+    rtl_sub(&t0, &t0, &t2);
+    rtl_sltu(&t0, &t0, &id_dest->val);
+    rtl_set_CF(&t0);
+  }
+
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_not(&t0);
+  rtl_xor(&t1, &id_dest->val, &t3);
   rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
@@ -57,24 +60,112 @@ make_EHelper(adc) {
   print_asm_template2(adc);
 }
 
-make_EHelper(sbb) {
-  rtl_sub(&t2, &id_dest->val, &id_src->val);
-  rtl_get_CF(&t1);
-  rtl_sub(&t2, &t2, &t1);
-  operand_write(id_dest, &t2);
+make_EHelper(sub) {
+  rtl_sub(&t3, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t3);
 
-  rtl_update_ZFSF(&t2, id_dest->width);
+  rtl_update_ZFSF(&t3, id_dest->width);
 
-  rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
   rtl_set_CF(&t0);
 
   rtl_xor(&t0, &id_dest->val, &id_src->val);
-  rtl_xor(&t1, &id_dest->val, &t2);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
+
+  print_asm_template2(sub);
+}
+
+make_EHelper(sbb) {
+  rtl_sub(&t3, &id_dest->val, &id_src->val);
+  rtl_get_CF(&t2);
+  rtl_sub(&t3, &t3, &t2);
+  operand_write(id_dest, &t3);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
+  rtl_sltu(&t1, &id_src->val, &id_dest->val);
+  if(1 == t0) {
+    rtl_set_CF(&t0);
+  }else if(1== t1){
+    rtl_set_CF(&tzero);
+  } else {
+    rtl_set_CF(&t2);
+  }
+
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_xor(&t1, &id_dest->val, &t3);
   rtl_and(&t0, &t0, &t1);
   rtl_msb(&t0, &t0, id_dest->width);
   rtl_set_OF(&t0);
 
   print_asm_template2(sbb);
+}
+
+make_EHelper(cmp) {
+  rtl_sub(&t3, &id_dest->val, &id_src->val);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
+  rtl_set_CF(&t0);
+
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
+
+  print_asm_template2(cmp);
+}
+
+make_EHelper(inc) {
+  rtl_addi(&t3, &id_dest->val, 1);
+  operand_write(id_dest, &t3);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_xori(&t0, &id_dest->val, 1);
+  rtl_not(&t0);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
+
+  print_asm_template1(inc);
+}
+
+make_EHelper(dec) {
+  rtl_subi(&t3, &id_dest->val, 1);
+  operand_write(id_dest, &t3);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_xori(&t0, &id_dest->val, 1);
+  rtl_xor(&t1, &id_dest->val, &t3);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
+
+  print_asm_template1(dec);
+}
+
+make_EHelper(neg) {
+  rtl_sub(&t3, &tzero, &id_dest->val);
+  operand_write(id_dest, &t3);
+
+  rtl_update_ZFSF(&t3, id_dest->width);
+
+  rtl_neq0(&t0, &id_dest->val);
+  rtl_set_CF(&t0);
+
+  rtl_xor(&t0, &t0, &t3);
+  rtl_set_OF(&t0);
+
+  print_asm_template1(neg);
 }
 
 make_EHelper(mul) {
@@ -98,6 +189,10 @@ make_EHelper(mul) {
   }
 
   print_asm_template1(mul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with one operand
@@ -122,6 +217,10 @@ make_EHelper(imul1) {
   }
 
   print_asm_template1(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with two operands
@@ -133,6 +232,10 @@ make_EHelper(imul2) {
   operand_write(id_dest, &t1);
 
   print_asm_template2(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 // imul with three operands
@@ -145,6 +248,10 @@ make_EHelper(imul3) {
   operand_write(id_dest, &t1);
 
   print_asm_template3(imul);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(div) {
@@ -178,6 +285,10 @@ make_EHelper(div) {
   }
 
   print_asm_template1(div);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
 
 make_EHelper(idiv) {
@@ -216,4 +327,8 @@ make_EHelper(idiv) {
   }
 
   print_asm_template1(idiv);
+
+  #ifdef DIFF_TEST
+    diff_test_skip_eflags();
+  #endif
 }
