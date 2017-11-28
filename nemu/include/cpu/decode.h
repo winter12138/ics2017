@@ -76,7 +76,11 @@ typedef void (*DHelper) (vaddr_t *);
 
 make_DHelper(I2E);
 make_DHelper(I2a);
+make_DHelper(Ib2a);
+make_DHelper(a2Ib);
 make_DHelper(r2a);
+make_DHelper(dw2a);
+make_DHelper(a2dw);
 make_DHelper(I2r);
 make_DHelper(SI2E);
 make_DHelper(SI_E2G);

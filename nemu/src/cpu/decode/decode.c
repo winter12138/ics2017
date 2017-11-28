@@ -169,12 +169,46 @@ make_DHelper(I2a) {
   decode_op_I(eip, id_src, true);
 }
 
+/* AL <- Ib
+ * eAX <- Ib
+ */
+make_DHelper(Ib2a) {
+  decode_op_a(eip, id_dest, false);
+  id_src->width = 1;
+  decode_op_I(eip, id_src, true);
+}
+
+/* Ib <- AL
+ * Ib <- eAX
+ */
+make_DHelper(a2Ib) {
+  id_dest->width = 1;
+  decode_op_I(eip, id_dest, true);
+  decode_op_a(eip, id_src, true);
+}
+
 /* AX <-> XX
  * eAX <-> eXX
  */
 make_DHelper(r2a) {
   decode_op_a(eip, id_dest, true);
   decode_op_r(eip, id_src, true);
+}
+
+/* AX <- DX
+ * eAX <- DX
+ */
+make_DHelper(dw2a) {
+  decode_op_a(eip, id_dest, false);
+  rtl_lr(&id_src->val, R_EDX, 2);
+}
+
+/* DX <- AX
+ * DX <- eAX
+ */
+make_DHelper(a2dw) {
+  rtl_lr(&id_dest->val, R_EDX, 2);
+  decode_op_a(eip, id_src, true);
 }
 
 /* Gv <- EvIb
