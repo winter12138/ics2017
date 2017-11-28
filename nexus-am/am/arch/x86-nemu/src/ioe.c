@@ -27,9 +27,11 @@ _Screen _screen = {
 extern void* memcpy(void *, const void *, int);
 
 void _draw_rect(const uint32_t *pixels, int x, int y, int w, int h) {
-  int i;
-  for (i = 0; i < _screen.width * _screen.height; i++) {
-    fb[i] = i;
+  int i,j;
+  for(i = 0; i < w; ++i) {
+  	for(j = 0; j < h; ++j) {
+  		fb[ (y+j) * _screen.width + x + i] = *pixels;
+  	}
   }
 }
 
