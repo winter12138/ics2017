@@ -250,6 +250,10 @@ make_DHelper(I) {
   decode_op_I(eip, id_dest, true);
 }
 
+make_DHelper(SI) {
+  decode_op_SI(eip, id_dest, true);
+}
+
 make_DHelper(r) {
   decode_op_r(eip, id_dest, true);
 }
@@ -359,8 +363,10 @@ make_DHelper(jcc) {
     decoding.jmp_eip &= 0xffff;
 }
 
-make_DHelper(push_SI) {
-  decode_op_SI(eip, id_dest, true);
+make_DHelper(call) {
+  decode_op_I(eip, id_dest, true);
+  id_dest->val += *eip;
+  decoding.jmp_eip = id_dest->val;
 }
 
 make_DHelper(in_I2a) {
@@ -401,14 +407,4 @@ void operand_write(Operand *op, rtlreg_t* src) {
   if (op->type == OP_TYPE_REG) { rtl_sr(op->reg, op->width, src); }
   else if (op->type == OP_TYPE_MEM) { rtl_sm(&op->addr, op->width, src); }
   else { assert(0); }
-}
-
-make_DHelper(call) {
-  decode_op_I(eip, id_dest, true);
-  id_dest->val += *eip;
-  decoding.jmp_eip = id_dest->val;
-}
-
-make_DHelper(pop_r) {
-  decode_op_r(eip, id_dest, false);
 }
