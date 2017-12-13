@@ -43,8 +43,7 @@ make_EHelper(int) {
 make_EHelper(iret) {
   rtl_pop(&cpu.eflags, 4);
   rtl_pop(&cpu.cs, 4);
-  rtl_pop(&t0, 4);
-  decoding.jmp_eip = t0;
+  rtl_pop(&decoding.jmp_eip, 4);
   decoding.is_jmp = true;
   
   print_asm("iret");
