@@ -30,11 +30,11 @@ void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
 
-int strcmp(const char *s, const char *t);
-//{
-//  while(*s && *t && *s++ == *t++);
-//  return *s - *t;
-//}
+int str_cmp(const char *s, const char *t)
+{
+  while(*s && *t && *s++ == *t++);
+  return *s - *t;
+}
 
 int fs_open(const char *pathname, int flags, int mode)
 {
@@ -44,7 +44,7 @@ int fs_open(const char *pathname, int flags, int mode)
   for (i = 0; i < NR_FILES; ++i)
   {
     fp = &file_table[i];
-    if(0 == strcmp(pathname, fp->name)){
+    if(0 == str_cmp(pathname, fp->name)){
       fp->open_offset = 0;
       return i;
     }
