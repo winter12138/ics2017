@@ -6,9 +6,19 @@ uintptr_t sys_none()
   return 1;
 }
 
-intptr_t sys_write()
+ssize_t sys_write(int fd, const void *buf, size_t count)
 {
-  return 1;
+  char ch;
+  size_t i;
+  if(1 == fd || 2 == fd){
+    for (i = 0; i < count; ++i)
+    {
+      ch = *((char*)buf + i);
+      _putc(ch);
+    }
+  }
+  
+  return count;
 }
 
 void sys_exit(int code)
@@ -19,14 +29,20 @@ void sys_exit(int code)
 _RegSet* do_syscall(_RegSet *r) {
   uintptr_t a[4];
   a[0] = SYSCALL_ARG1(r);
+  a[1] = SYSCALL_ARG2(r);
+  a[2] = SYSCALL_ARG3(r);
+  a[3] = SYSCALL_ARG4(r);
 
   switch (a[0]) {
-  	case SYS_none: {
-  		SYSCALL_ARG1(r) = sys_none();
-  		break;
-  	}
+    case SYS_none: {
+      SYSCALL_ARG1(r) = sys_none();
+      break;
+    }
+    case SYS_write: {
+      SYSCALL_ARG1(r) = sys_write(a[1], (void*)a[2], a[3]);
+      break;
+    }
   	case SYS_exit: {
-  		a[1] = SYSCALL_ARG2(r);
   		sys_exit(a[1]);
   		break;
   	}
