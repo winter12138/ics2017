@@ -36,7 +36,7 @@ void *_sbrk(intptr_t increment){
   void *old, *new;
   old = _end;
   new = old + increment;
-  char buf[100]={0};
+  char buf[100];
   sprintf(buf, "%p\n", _end);
   _write(1, buf, 10);
 
