@@ -32,12 +32,6 @@ void init_fs() {
 
 int strcmp(const char *s, const char *t);
 
-int str_cmp(const char *s, const char *t)
-{
-  while(*s && *t && *s++ == *t++);
-  return *s - *t;
-}
-
 int fs_open(const char *pathname, int flags, int mode)
 {
   int i;
