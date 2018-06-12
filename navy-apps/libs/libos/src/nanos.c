@@ -30,18 +30,19 @@ int _write(int fd, void *buf, size_t count){
 }
 
 extern void* _end;
+extern char etext, edata, end;
 
 void *_sbrk(intptr_t increment){
   char buf[100];
-  sprintf(buf, "%p\n", _end);
+  sprintf(buf, "%p\n", &end);
   _write(1, buf, 10);
   //return (void *)-1;
   void *old, *new;
-  old = _end;
+  old = &end;
   new = old + increment;
 
   if(0 == _syscall_(SYS_brk, new, 0, 0)){
-    _end = new;
+    //_end = new;
     return old;
   } else {
     return (void *)-1;
