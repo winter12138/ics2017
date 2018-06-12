@@ -17,13 +17,18 @@ ssize_t sys_write(int fd, const void *buf, size_t count)
       _putc(ch);
     }
   }
-  
+  Log("1");
   return count;
+}
+
+int sys_brk(void *addr)
+{
+  return 0;
 }
 
 void sys_exit(int code)
 {
-	_halt(code);
+  _halt(code);
 }
 
 _RegSet* do_syscall(_RegSet *r) {

@@ -11,6 +11,10 @@ int main() {
       printf("Hello World for the %dth time\n", i ++);
       j = 0;
     }
+    if (10 == i)
+    {
+      break;
+    }
   }
   return 0;
 }
