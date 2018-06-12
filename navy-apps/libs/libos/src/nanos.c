@@ -22,11 +22,15 @@ void _exit(int status) {
 }
 
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
+  int ret = -1;
+  ret = _syscall_(SYS_open, fd, buf, count);
+  return ret;
 }
 
 int _write(int fd, void *buf, size_t count){
-  _exit(SYS_write);
+  int ret = -1;
+  ret = _syscall_(SYS_write, fd, buf, count);
+  return ret;
 }
 
 void *_sbrk(intptr_t increment){
@@ -34,15 +38,21 @@ void *_sbrk(intptr_t increment){
 }
 
 int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
+  int ret = -1;
+  ret = _syscall_(SYS_read, fd, buf, count);
+  return ret;
 }
 
 int _close(int fd) {
-  _exit(SYS_close);
+  int ret = -1;
+  ret = _syscall_(SYS_close, fd, buf, count);
+  return ret;
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
+  int ret = -1;
+  ret = _syscall_(SYS_lseek, fd, buf, count);
+  return ret;
 }
 
 // The code below is not used by Nanos-lite.
