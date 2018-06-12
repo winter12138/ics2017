@@ -1,24 +1,34 @@
 #include "common.h"
 #include "syscall.h"
+#include "fs.h"
 
 uintptr_t sys_none()
 {
   return 1;
 }
-
-ssize_t sys_write(int fd, const void *buf, size_t count)
+int sys_open(const char *pathname, int flags, int mode)
 {
-  char ch;
-  size_t i;
-  if(1 == fd || 2 == fd){
-    for (i = 0; i < count; ++i)
-    {
-      ch = *(char*)(buf + i);
-      _putc(ch);
-    }
-  }
-  Log("1");
-  return count;
+  return fs_open(pathname, flags, mode);
+}
+
+ssize_t sys_read(int fd, void *buf, size_t len)
+{
+  return fs_read(fd, buf, len);
+}
+
+ssize_t sys_write(int fd, const void *buf, size_t len)
+{
+  return fs_write(fd, buf, len);
+}
+
+off_t sys_lseek(int fd, off_t offset, int whence)
+{
+  return fs_lseek(fd, offset, whence);
+}
+
+int sys_close(int fd)
+{
+  return fs_close(fd);
 }
 
 int sys_brk(void *addr)
@@ -43,8 +53,24 @@ _RegSet* do_syscall(_RegSet *r) {
       SYSCALL_ARG1(r) = sys_none();
       break;
     }
+    case SYS_open: {
+      SYSCALL_ARG1(r) = sys_open((const char *)a[1], a[2], a[3]);
+      break;
+    }
+    case SYS_read: {
+      SYSCALL_ARG1(r) = sys_read(a[1], (void*)a[2], a[3]);
+      break;
+    }
     case SYS_write: {
       SYSCALL_ARG1(r) = sys_write(a[1], (void*)a[2], a[3]);
+      break;
+    }
+    case SYS_lseek: {
+      SYSCALL_ARG1(r) = sys_lseek(a[1], a[2], a[3]);
+      break;
+    }
+    case SYS_close: {
+      SYSCALL_ARG1(r) = sys_close(a[1]);
       break;
     }
     case SYS_brk: {
