@@ -32,7 +32,7 @@ int _write(int fd, void *buf, size_t count){
 extern void* _end;
 
 void *_sbrk(intptr_t increment){
-  return (void *)-1;
+  //return (void *)-1;
   void *old, *new;
   old = _end;
   new = old + increment;
