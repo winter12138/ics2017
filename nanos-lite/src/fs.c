@@ -61,7 +61,10 @@ ssize_t fs_read(int fd, void *buf, size_t len)
 
   Log("%s, %d, %d, %d\n", fp->name, fp->open_offset, len, fp->size);
 
-  assert(fp->open_offset + len <= fp->size);
+  if(fp->open_offset + len > fp->size){
+    len = fp->size - fp->open_offset;
+  }
+
   ramdisk_read(buf, fp->disk_offset + fp->open_offset, len);
   fp->open_offset += len;
   return len;
