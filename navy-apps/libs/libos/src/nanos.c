@@ -47,9 +47,9 @@ extern char end;
 void *_sbrk(intptr_t increment){
   //return (void *)-1;
 
-  char buf[100];
-  sprintf(buf, "%p\n", &end);
-  _write(1, buf, 10);
+  //char buf[100];
+  //sprintf(buf, "%p\n", &end);
+  //_write(1, buf, 10);
 
   if(!_end){
     _end = &end;
