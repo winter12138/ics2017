@@ -3,7 +3,12 @@
 
 uintptr_t sys_none()
 {
-	return 1;
+  return 1;
+}
+
+intptr_t sys_write()
+{
+  return 1;
 }
 
 void sys_exit(int code)
