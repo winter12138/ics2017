@@ -36,9 +36,9 @@ void *_sbrk(intptr_t increment){
   void *old, *new;
   old = _end;
   new = old + increment;
-  //char buf[100]={0};
-  //sprintf(buf, "%p\n", _end);
-  //_write(1, buf, 10);
+  char buf[100]={0};
+  sprintf(buf, "%p\n", _end);
+  _write(1, buf, 10);
 
   if(0 == _syscall_(SYS_brk, new, 0, 0)){
     _end = new;
