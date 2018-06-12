@@ -108,13 +108,13 @@ off_t fs_lseek(int fd, off_t offset, int whence)
   return fp->open_offset;
 }
 
-int fs_close(int fd)
-{
-  return 0;
-}
-
 size_t fs_filesz(int fd)
 {
   Finfo *fp = &file_table[fd];
   return fp->size;
+}
+
+int fs_close(int fd)
+{
+  return 0;
 }
