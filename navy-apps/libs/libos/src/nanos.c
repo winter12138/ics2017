@@ -29,17 +29,17 @@ int _write(int fd, void *buf, size_t count){
   return _syscall_(SYS_write, fd, buf, count);
 }
 
-extern void* _end;
+extern char _end;
 
 void *_sbrk(intptr_t increment){
   //return (void *)-1;
   void *old, *new;
-  old = _end;
+  old = &_end;
   new = old + increment;
-  char buf[100];
-  sprintf(buf, "%p\n", _end);
-  _write(1, buf, 100);
-  
+  char buf[100]={0};
+  sprintf(buf, "%p\n", &_end);
+  _write(1, buf, 10);
+
   if(0 == _syscall_(SYS_brk, new, 0, 0)){
     _end = new;
     return old;
