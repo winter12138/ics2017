@@ -6,7 +6,7 @@ include $(AM_HOME)/Makefile.app
 FSIMG_PATH = $(NAVY_HOME)/fsimg
 RAMDISK_FILE = build/ramdisk.img
 
-TEST ?= dummy
+TEST ?= hello
 
 OBJCOPY_FLAG = -S --set-section-flags .bss=alloc,contents -O binary
 OBJCOPY_FILE = $(NAVY_HOME)/tests/$(TEST)/build/$(TEST)-x86
