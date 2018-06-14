@@ -25,12 +25,13 @@ static Finfo file_table[] __attribute__((used)) = {
 
 void ramdisk_read(void *buf, off_t offset, size_t len);
 void ramdisk_write(const void *buf, off_t offset, size_t len);
+void dispinfo_read(void *buf, off_t offset, size_t len);
+void fb_write(const void *buf, off_t offset, size_t len);
 
 void init_fs() {
   // TODO: initialize the size of /dev/fb
+  file_table[FD_FB].size = _screen.width*_screen.height*4;
 }
-
-int strcmp(const char *s, const char *t);
 
 int fs_open(const char *pathname, int flags, int mode)
 {
@@ -55,12 +56,24 @@ ssize_t fs_read(int fd, void *buf, size_t len)
 
   Log("%s, %d, %d, %d\n", fp->name, fp->open_offset, len, fp->size);
 
-  if(fp->open_offset + len > fp->size){
-    len = fp->size - fp->open_offset;
+  switch(fd) {
+    case FD_DISPINFO: {
+      if(fp->open_offset + len > fp->size){
+        len = fp->size - fp->open_offset;
+      }
+      dispinfo_read(buf, fp->open_offset, len);
+      fp->open_offset += len;
+      break;
+    }
+    default: {
+      if(fp->open_offset + len > fp->size){
+        len = fp->size - fp->open_offset;
+      }
+      ramdisk_read(buf, fp->disk_offset + fp->open_offset, len);
+      fp->open_offset += len;
+    }
   }
 
-  ramdisk_read(buf, fp->disk_offset + fp->open_offset, len);
-  fp->open_offset += len;
   return len;
 }
 
@@ -70,16 +83,30 @@ ssize_t fs_write(int fd, const void *buf, size_t len)
   size_t i;
   Finfo *fp = &file_table[fd];
 
-  if(1 == fd || 2 == fd){
-    for (i = 0; i < len; ++i)
-    {
-      ch = *(char*)(buf + i);
-      _putc(ch);
+  switch (fd) {
+    case FD_STDOUT:
+    case FD_STDERR: {
+      // call _putc()
+      for (i = 0; i < len; ++i)
+      {
+        ch = *(char*)(buf + i);
+        _putc(ch);
+      }
+      break;
     }
-  } else {
-    assert(fp->open_offset + len <= fp->size);
-    ramdisk_write(buf, fp->disk_offset + fp->open_offset, len);
-    fp->open_offset += len;
+    case FD_FB: {
+      // write to frame buffer
+      assert(fp->open_offset + len <= fp->size);
+      fb_write(buf, fp->open_offset, len);
+      fp->open_offset += len;
+      break;
+    }
+    default: {
+      // write to ramdisk
+      assert(fp->open_offset + len <= fp->size);
+      ramdisk_write(buf, fp->disk_offset + fp->open_offset, len);
+      fp->open_offset += len;
+    }
   }
 
   return len;
