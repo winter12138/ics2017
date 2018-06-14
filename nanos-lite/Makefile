@@ -6,8 +6,10 @@ include $(AM_HOME)/Makefile.app
 FSIMG_PATH = $(NAVY_HOME)/fsimg
 RAMDISK_FILE = build/ramdisk.img
 
+TEST ?= dummy
+
 OBJCOPY_FLAG = -S --set-section-flags .bss=alloc,contents -O binary
-OBJCOPY_FILE = $(NAVY_HOME)/tests/dummy/build/dummy-x86
+OBJCOPY_FILE = $(NAVY_HOME)/tests/$(TEST)/build/$(TEST)-x86
 
 .PHONY: update update-ramdisk-objcopy update-ramdisk-fsimg update-fsimg
 
@@ -31,5 +33,5 @@ update-ramdisk-fsimg: update-fsimg
 src/syscall.h: $(NAVY_HOME)/libs/libos/src/syscall.h
 	ln -sf $^ $@
 
-update: update-ramdisk-objcopy src/syscall.h
+update: update-ramdisk-fsimg src/syscall.h
 	@touch src/initrd.S

@@ -22,28 +22,50 @@ void _exit(int status) {
 }
 
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
+  return _syscall_(SYS_open, path, flags, mode);
 }
 
-int _write(int fd, void *buf, size_t count){
-  _exit(SYS_write);
+int _read(int fd, void *buf, size_t len) {
+  return _syscall_(SYS_read, fd, buf, len);
 }
 
-void *_sbrk(intptr_t increment){
-  return (void *)-1;
-}
-
-int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
-}
-
-int _close(int fd) {
-  _exit(SYS_close);
+int _write(int fd, void *buf, size_t len){
+  return _syscall_(SYS_write, fd, buf, len);
 }
 
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
+  return _syscall_(SYS_lseek, fd, offset, whence);
 }
+
+int _close(int fd) {
+  return _syscall_(SYS_close, fd, 0, 0);
+}
+
+void* _end = NULL;
+extern char end;
+
+void *_sbrk(intptr_t increment){
+  //return (void *)-1;
+
+  //char buf[100];
+  //sprintf(buf, "%p\n", &end);
+  //_write(1, buf, 10);
+
+  if(!_end){
+    _end = &end;
+  }
+  void *old, *new;
+  old = _end;
+  new = old + increment;
+
+  if(0 == _syscall_(SYS_brk, new, 0, 0)){
+    _end = new;
+    return old;
+  } else {
+    return (void *)-1;
+  }
+}
+
 
 // The code below is not used by Nanos-lite.
 // But to pass linking, they are defined as dummy functions

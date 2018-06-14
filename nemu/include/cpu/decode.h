@@ -87,6 +87,7 @@ make_DHelper(SI_E2G);
 make_DHelper(I_E2G);
 make_DHelper(I_G2E);
 make_DHelper(I);
+make_DHelper(SI);
 make_DHelper(r);
 make_DHelper(E);
 make_DHelper(setcc_E);
@@ -117,9 +118,6 @@ make_DHelper(J);
 make_DHelper(J_call_A);
 make_DHelper(jcc);
 make_DHelper(call);
-
-make_DHelper(push_SI);
-make_DHelper(pop_r);
 
 make_DHelper(in_I2a);
 make_DHelper(in_dx2a);

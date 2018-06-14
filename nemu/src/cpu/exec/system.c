@@ -1,7 +1,14 @@
 #include "cpu/exec.h"
 
 make_EHelper(lidt) {
-  TODO();
+  int width;
+  width = decoding.is_operand_size_16? 3: 4;
+
+  rtl_lm(&t0, &id_dest->addr, 2);
+  cpu.idtr.limit = t0;
+  id_dest->addr += 2;
+  rtl_lm(&t0, &id_dest->addr, width);
+  cpu.idtr.base = t0;
 
   print_asm_template1(lidt);
 }
@@ -22,8 +29,9 @@ make_EHelper(mov_cr2r) {
 #endif
 }
 
+void raise_intr(uint8_t NO, vaddr_t ret_addr);
 make_EHelper(int) {
-  TODO();
+  raise_intr(id_dest->val, *eip);
 
   print_asm("int %s", id_dest->str);
 
@@ -33,8 +41,11 @@ make_EHelper(int) {
 }
 
 make_EHelper(iret) {
-  TODO();
-
+  rtl_pop(&decoding.jmp_eip, 4);
+  rtl_pop(&cpu.cs, 4);
+  rtl_pop(&cpu.eflags, 4);
+  decoding.is_jmp = true;
+  
   print_asm("iret");
 }
 

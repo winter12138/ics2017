@@ -3,6 +3,7 @@
 .*
 !.gitignore
 *~
+!nexus-am/libs/klib/build/klib-x86-nemu.a
 *.a
 *.o
 *.d
