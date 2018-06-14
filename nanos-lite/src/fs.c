@@ -47,8 +47,8 @@ int fs_open(const char *pathname, int flags, int mode)
       return i;
     }
   }
+  Log("%s %d %d \n", pathname, i, NR_FILES);
   assert(i < NR_FILES);
-  Log("%d %d \n", i, NR_FILES);
   return -1;
 }
 
