@@ -14,7 +14,7 @@ size_t events_read(void *buf, size_t len) {
 	int key;
 	key = _read_key();
   if(key == _KEY_NONE) {
-  	sprintf(buf, "t %llu\n", _uptime());
+  	sprintf(buf, "t %ld\n", _uptime());
   }else if((key & KEYDOWN_MASK) != 0){
     key &= ~KEYDOWN_MASK;
     sprintf(buf, "kd %s\n", keyname[key]);
