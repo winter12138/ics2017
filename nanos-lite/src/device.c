@@ -8,8 +8,20 @@ static const char *keyname[256] __attribute__((used)) = {
   _KEYS(NAME)
 };
 
+
+#define KEYDOWN_MASK 0x8000
 size_t events_read(void *buf, size_t len) {
-  return 0;
+	int key;
+	key = _read_key();
+  if(key == _KEY_NONE) {
+  	sprintf(buf, "t %lu\n", _uptime());
+  }else if((key & KEYDOWN_MASK) != 0){
+    key &= ~KEYDOWN_MASK;
+    sprintf(buf, "kd %s\n", keyname[key]);
+  } else {
+    sprintf(buf, "ku %s\n", keyname[key]);
+  }
+  return strlen(buf);
 }
 
 static char dispinfo[128] __attribute__((used));
